@@ -1,0 +1,67 @@
+ atmega328
+#define F_CPU 8000000
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+
+int main(void)
+{
+       char tempC ,char temp;
+       DDRC = DDRC & (~(1<<PC1)); // configure pin 0 of PORTD to be input pin temperture sensor
+       DDRD = DDRD & (~(1<<PD2)); // configure pin 2 of PORTD to be input pin push putton
+       DDRC = DDRC | (1<<PC0);    // configure pin 0 of PORTC to be output pin
+       PORTC = PORdTC & (~(1<<PC0));  // led is off at the beginning
+       ADCSRA=0XC6;
+       ADMUX=0X61;
+
+
+       EICRA |= (1 << ISC00);    // set INT0 to trigger on ANY logic change
+       EIMSK |= (1 << INT0);     // Turns on INT0
+
+
+      sei();                    // turn on interrupts
+
+
+ while(1) {
+        //conversion to degrees C - from sensor output voltage per LM61 data sheet
+         tempc=adcread();
+         temp = ((tempc*3.3)-0.600)*100.0;
+         TransmitByte(temp);
+         _delay_ms(3000);
+
+
+    }
+     Init_USART(unsigned char baudrate)
+
+
+     timer1_CTC_ISR()
+}
+
+
+
+void Init_USART(unsigned char baudrate)
+  {
+   UBRRH=baudrate>>8;
+   UBRRL=baudrate;
+   UCSRB |=(1<<RXEN);
+   UCSRC= 0x86;
+  }
+
+void TransmitByte(unsigned char dbyte)
+   {  while((UCSRA & (1<<UDRE))==0);
+       UDR = dbyte;
+    }
+
+Unsigned int adcRead ()
+{
+ADCSRA |= (1 << ADSC);
+While (ADCSRA&(1 <<ADSC);
+Return ADC;
+}
+
+
+ISR (INT0_vect)
+{
+ portc^ =(1<<0);
+}
+
